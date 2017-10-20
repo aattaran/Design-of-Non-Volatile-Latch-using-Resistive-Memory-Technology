@@ -1,0 +1,39 @@
+* MTJ subcircuit model
+
+.hdl 'stt.va'
+
+
+*********************
+*  parameter list   *
+*********************
+* STT-MTJ geometry, r: radius, tox: oxide thickness of STT-MTJ, state: initial state (0: Parallel, 1: Anti-parallel)
+*recommended values for 65nm process
+*.param r = 65n
+*.param tox = 1.2n
+
+
+*********************
+*  port list   *
+*********************
+*nfl: Free Layer node
+*npl: Pinned Layer node
+*nthera: Magnetic Angle as output voltage
+*nr: MTJ dynamic resistance as output voltage
+
+*********************
+*      netlist      *
+*********************
+.subckt mtj nfl npl ntheta nr state = 0 r = 32n tox = 1n tmr = 2
+
+xM1 net1 npl ntheta 0 hys r=r
+xM2 ntheta 0 ani r=r
+xC1 ntheta 0 caps1 r=r
+xRout ntheta nr 0 nfl net1 vcr0 r=r tox=tox TMR0=tmr
+xRwrite ntheta nfl net1 vcr r=r tox=tox TMR0=tmr
+
+.ic V(ntheta) = '3.14*state'
+.nodeset V(ntheta) = '3.14*state'
+
+.ends
+
+

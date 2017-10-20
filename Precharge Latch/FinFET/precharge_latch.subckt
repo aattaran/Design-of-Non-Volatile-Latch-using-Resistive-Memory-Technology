@@ -1,0 +1,39 @@
+.subckt mtj_latch vdd vss se q qbar stat=0   
+
+***sense amplifier scaling factor
+.param fins=1
+
+
+***sense enable footer
+xse gndv se vss vss nfet  nfin=fins_n3  
+
+***PMOS Precharge***************
+
+x15 net1 se vdd vdd pfet  nfin=fins_p1 
+x14 net2 se vdd vdd pfet  nfin=fins_p1
+
+**** Latch
+
+xp1 net1 net2 vdd vdd pfet  nfin=fins_p2  
+xp2 net2 net1 vdd vdd pfet  nfin=fins_p2  
+
+xn1 net1 net2 net3 vss nfet  nfin=fins_n1  
+xn2 net2 net1 net4 vss nfet  nfin=fins_n1  
+***** MTJs
+xMTJ1 net3 gndv mtj state = '1-stat' 
+
+xMTJ2 net4 gndv mtj state = stat 
+
+***INV buffers ***
+x21 q net1 vss vss nfet  nfin=fins_n2  
+x24 q net1 vdd vdd pfet  nfin=fins_n2  
+
+x20 qbar net2 vss vss nfet  nfin=fins_p3  
+x19 qbar net2 vdd vdd pfet  nfin=fins_p3  
+
+*.ic v(q) = vdd
+*.ic v(qbar) = vdd
+*.nodeset v(q) = vdd
+*.nodeset v(qbar) = vdd
+
+.ends
