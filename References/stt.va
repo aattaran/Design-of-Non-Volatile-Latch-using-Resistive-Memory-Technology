@@ -1,0 +1,143 @@
+// Spin Transfer Torque (STT) MRAM model card
+
+`include "disciplines.vams"
+`include "constants.vams"
+
+
+// Spin Transfer Torque
+module hys(bl,sl,m,n);
+
+	inout bl,sl,m,n;
+   	electrical bl,sl,m,n;
+
+    	parameter real r = 45e-9;	// Radius of STT-MTJ
+   	parameter real r0= 45e-9;	// Default radius of STT-MTJ
+    	real i1,h1;
+	
+analog
+begin
+	i1 = I(bl,sl);			// Input current through STT-MTJ
+	if (i1<0)
+		if (V(m) >= 3.141592)
+			I(m,n) <+ 0;
+		else
+			I(m,n) <+ 1.29e18*(r0*r0/r/r)*i1;	// Spin Transfer Torque regulated by transfer efficiency
+	else	
+		if (V(m) <= 0.0001)
+			I(m,n) <+ 0;
+		else
+			I(m,n) <+ 1.94e18*(r0*r0/r/r)*i1;
+
+end
+endmodule
+
+
+// Damping
+module ani(m,n);
+
+	inout m,n;
+    	electrical m,n;
+
+    	parameter real K = 1.13e5;		// Anisotropic constant
+	parameter real a = 0.02;		// Damping constanct
+	parameter real gamma = 1.76e11;		// Gyromagnetic ratio
+	parameter real mu0 = 1.26e-6;		// Vacuum permeability
+	parameter real Ms0 = 4.81e5; 		// Default saturation magnetization
+	parameter real H0 = 1.5e5; 		// Intrinsic magnetic field
+	parameter real r = 45e-9;		// Radius of STT-MTJ
+	real Ms;
+	
+analog
+begin
+	
+	Ms = Ms0*(4*(1-1/(4*r/0.24e-9-1))*exp(-26/3/(4*r/0.24e-9-1))-3);	// Saturation magnetization
+	I(m,n) <+ a*gamma*(mu0*Ms*H0*sin(V(m))+2*K*cos(V(m))*sin(V(m)));	// Damping torque
+
+end
+endmodule
+
+
+// Capacitance used in simulation
+module caps1(p,n);
+ 	
+	inout p,n;
+ 	electrical p,n;
+
+ 	parameter real Ms0 = 4.81e5;		// Default saturation magnetization
+ 	parameter real r = 45e-9;		// Radius of STT-MTJ
+ 	parameter real r0= 45e-9;		// Default radius of STT-MTJ
+ 	real Ms;
+ 
+analog
+begin
+
+	Ms = Ms0*(4*(1-1/(4*r/0.24e-9-1))*exp(-26/3/(4*r/0.24e-9-1))-3);	// Saturation magnetization
+	I(p,n) <+ Ms*ddt(V(p,n));
+
+end
+endmodule
+
+
+// The component to indicate the resistance of STT-MTJ
+module vcr0(c, o5, o6, i5, i6);
+ 
+	input c, i5, i6;
+	output o5, o6;
+ 	electrical c,i5,i6,o5,o6;
+
+	parameter real r=45e-9;			// Radius of STT-MTJ
+	parameter real tox=0.85e-9;		// Oxide thickness of STT-MTJ
+	parameter real F = 211;
+	parameter real phi = 0.4;
+ 	parameter real A = 3.1416*r*r;		// Area of STT-MTJ
+/*----------TMR(0) with Zero Volt Bias Voltage ---------------*/
+	parameter real TMR0 = 1; 		// Default tunnel magneto-resistance
+/*----------Voltage bias when the TMR(real) is 1/2TMR(0) in Volt---------------*/
+	parameter real  Vh=0.5;		//experiental value with MgO barrier
+
+	real TMRR;	//TMR real value
+
+	real Rp, R;
+
+analog
+begin
+	TMRR=TMR0/(1+V(i5,i6)*V(i5,i6)/(Vh*Vh));
+	Rp = tox/(F*sqrt(phi)*A)*exp(1.025*tox*sqrt(phi));	// STT-MTJ resistance in parallel state
+	R = 2*Rp*(TMRR+1)/(TMRR+2+TMRR*cos(V(c)));		// STT-MTJ resistance in transition
+	V(o5,o6) <+ R;
+
+end
+endmodule
+
+
+// Model STT-MTJ as a resistor
+module vcr(c, o5, o6);
+ 
+	input c;
+ 	inout o5, o6;
+ 	electrical c,o5,o6;
+
+	parameter real r=45e-9;
+	parameter real tox=0.85e-9;
+	parameter real F = 211;
+	parameter real phi = 0.4;
+ 	parameter real A = 3.1416*r*r;
+/*----------TMR(0) with Zero Volt Bias Voltage ---------------*/
+	parameter real TMR0 = 1;  
+/*----------Voltage bias when the TMR(real) is 1/2TMR(0) in Volt---------------*/
+	parameter real  Vh=0.5;		//experiental value with MgO barrier
+
+	real TMRR;	//TMR real value
+
+	real Rp, R;
+
+analog
+begin
+	TMRR=TMR0/(1+V(o5,o6)*V(o5,o6)/(Vh*Vh));
+	Rp = tox/(F*sqrt(phi)*A)*exp(1.025*tox*sqrt(phi));
+	R = 2*Rp*(TMRR+1)/(TMRR+2+TMRR*cos(V(c)));
+	V(o5,o6) <+ I(o5,o6)*R;
+
+end
+endmodule
+
