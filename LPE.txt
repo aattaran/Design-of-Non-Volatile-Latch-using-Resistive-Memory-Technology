@@ -1,0 +1,18 @@
+../testcell.hercules.lvs/TOPCELLNAME_MILKYWAY                         ---->      /Users/students/aattaran/Control_Logic_Soren.hercules.lvs/TOPCELLNAME_MILKYWAY/XTR
+
+/packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/hercules_cmd/starrc/saed32nm_1p9m_layer.map
+
+TAB 1:
+RUNSET : /packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/hercules_cmd/saed32nm_1p9m_star_nominal.cmd
+
+TAB 2:
+Milkyway XTR View: /Users/students/aattaran/Circuit_Name.hercules.lvs/TOPCELLNAME_MILKYWAY
+
+MAPPING FILE: /packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/saed32nm_1p9m_layer.map
+
+TCAD GRD: /packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/nominal/saed32nm_1p9m_nominal.nxtgrd
+
+TAB 3: 
+OUTPUT RUNSET :/Users/students/aattaran/Control_Logic_Soren.starrc.lpe/saed32nm_1p9m_star_nominal.cdesigner.cmd
+DEVICE MAP: /packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/saed32nm_1p9m_device.map
+LAYER MAP: /packages/process_kit/generic/generic_32nm/ipdk32_28nm_apr2017/SAED_PDK32nm/starrc/saed32nm_1p9m_output_layer.map
